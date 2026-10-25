@@ -1,0 +1,6 @@
+{
+  "model": "MultinomialNB",
+  "threshold": 0.17,
+  "vectorizer": "email_vectorizer.joblib",
+  "classifier": "email_best_model.joblib"
+}

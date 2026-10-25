@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}PhishGuard AI{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v='chat-2') }}">
+</head>
+<body>
+<header class="pg-navbar">
+  <div class="container nav-inner">
+    <a class="navbar-brand" href="{{ url_for('home') }}"><svg aria-hidden="true"><use href="{{ url_for('static', filename='icons.svg') }}#shield"></use></svg>PhishGuard <span>AI</span></a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="navMenu" aria-label="Toggle navigation">Menu</button>
+    <nav id="navMenu" class="nav-menu" aria-label="Main navigation">
+      <a class="nav-link" href="{{ url_for('home') }}" {% if request.endpoint == 'home' %}aria-current="page"{% endif %}>Home</a>
+      <a class="nav-link" href="{{ url_for('analyze') }}" {% if request.endpoint == 'analyze' %}aria-current="page"{% endif %}>Message Analysis</a>
+      <a class="nav-link" href="{{ url_for('performance') }}" {% if request.endpoint == 'performance' %}aria-current="page"{% endif %}>Model Performance</a>
+      <a class="nav-link" href="{{ url_for('awareness') }}" {% if request.endpoint == 'awareness' %}aria-current="page"{% endif %}>Phishing Awareness</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container py-4">
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="pg-footer">
+  <div class="container">
+    <p class="mb-1">PhishGuard AI &mdash; Educational phishing-awareness project. Not an official VIT system.</p>
+    <p class="mb-0 small text-muted">Built with Python, Flask &amp; scikit-learn. All data on this site is synthetic/demo data.</p>
+  </div>
+</footer>
+
+{% set chat_message = message if request.endpoint == 'analyze' and result is defined and result else '' %}
+{% set chat_sender = sender if request.endpoint == 'analyze' and result is defined and result else '' %}
+{% set chat_url = url_hint if request.endpoint == 'analyze' and result is defined and result else '' %}
+<div class="pg-chat" id="pgChat" data-message="{{ chat_message }}" data-sender="{{ chat_sender }}" data-url="{{ chat_url }}">
+  <section class="pg-chat-panel" id="pgChatPanel" aria-label="PhishGuard Assistant" aria-hidden="true" hidden>
+    <header class="pg-chat-header">
+      <div><h2>PhishGuard Assistant</h2><p>Explains results. Never changes them. Runs locally.</p></div>
+      <button class="pg-chat-close" id="pgChatClose" type="button" aria-label="Close assistant">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      </button>
+    </header>
+    <div class="pg-chat-status-row"><span class="pg-chat-status-dot" id="pgChatStatusDot" aria-hidden="true"></span><span id="pgChatStatus" role="status">Checking local assistant…</span></div>
+    <div class="pg-chat-unavailable" id="pgChatUnavailable" hidden>
+      <strong>Assistant unavailable. The analysis still works.</strong>
+      <span id="pgChatSetupHint">Start Ollama locally and install a model such as llama3.2:3b.</span>
+    </div>
+    <div class="pg-chat-messages" id="pgChatMessages" role="log" aria-live="polite" aria-relevant="additions text" aria-label="Chat messages"></div>
+    <div class="pg-chat-typing" id="pgChatTyping" role="status" hidden><span class="pg-chat-dots" aria-hidden="true"></span><span id="pgChatTypingText">Thinking…</span></div>
+    <div class="pg-chat-error" id="pgChatError" role="alert" hidden></div>
+    <div class="pg-chat-chips" id="pgChatChips" aria-label="Suggested questions">
+      <button type="button" data-question="Why this label?">Why this label?</button>
+      <button type="button" data-question="What should I do?">What should I do?</button>
+      <button type="button" data-question="How do I report this?">How do I report this?</button>
+    </div>
+    <form class="pg-chat-form" id="pgChatForm">
+      <label class="visually-hidden" for="pgChatInput">Ask about the result or phishing safety</label>
+      <textarea id="pgChatInput" rows="2" maxlength="500" placeholder="Ask a question…" disabled></textarea>
+      <button id="pgChatSend" type="submit" aria-label="Send message" disabled>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 21 3l-8.5 18-2.3-7.2L3 11.5Z"/><path d="m10.2 13.8 4.5-4.5"/></svg>
+      </button>
+    </form>
+    <button type="button" class="pg-chat-clear" id="pgChatClear">Clear chat</button>
+  </section>
+  <button class="pg-chat-bubble" id="pgChatOpen" type="button" aria-label="Open PhishGuard assistant" aria-expanded="false" aria-controls="pgChatPanel">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H5l1.4-3.5A7.5 7.5 0 1 1 20 11.5Z"/><path d="M8.5 11.5h.01m4 0h.01m4 0h.01"/></svg>
+  </button>
+</div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/chat.js', v='chat-2') }}" defer></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Phishing Awareness — PhishGuard AI{% endblock %}
+{% block content %}
+<h2 class="mb-4">Phishing Awareness</h2>
+
+<div class="alert alert-warning">
+  <strong>About the October 2026 reports:</strong> some students received messages claiming their VIT
+  accounts would be suspended unless they clicked a link immediately. If you receive a message like this,
+  do not click the link. Verify through the official VIT portal or helpdesk channels you already know and
+  trust, not through any contact details given in the suspicious message itself.
+</div>
+
+<div class="row g-4 mb-4">
+  <div class="col-md-6">
+    <div class="card pg-card h-100">
+      <div class="card-body">
+          <h5>Common Red Flags</h5>
+        <ul>
+          <li><strong>Urgency:</strong> "act within 2 hours", "immediately", "final warning"</li>
+          <li><strong>Threats:</strong> account suspension, deactivation, legal action</li>
+          <li><strong>Credential requests:</strong> being asked to send a password, OTP, or PIN</li>
+          <li><strong>Suspicious links:</strong> shortened URLs, lookalike domains, unusual top-level domains</li>
+          <li><strong>Sender mismatch:</strong> an "official" message from a non-institutional email address</li>
+          <li><strong>Unexpected money requests:</strong> fees, refunds, or scholarships tied to urgent payment</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card pg-card h-100">
+      <div class="card-body">
+          <h5>What To Do Instead</h5>
+        <ul>
+          <li>Pause before clicking &mdash; phishing relies on rushing you.</li>
+          <li>Go to the official site by typing the address yourself, not by clicking the link.</li>
+          <li>Verify with IT support or your institution through a known, trusted channel.</li>
+          <li>Never share your password or OTP with anyone, including "IT support" over chat/email.</li>
+          <li>Report suspicious messages to your organization's official security contact.</li>
+          <li>When unsure, use a tool like PhishGuard AI's Message Analysis page for a second opinion
+            &mdash; but still verify independently.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card pg-card mb-4"><div class="card-body">
+  <h5>How to report a suspicious message</h5>
+  <ol>
+    <li>Do not reply, open links, or forward the message to other people.</li>
+    <li>Capture the sender and message details without opening any link.</li>
+    <li>Report through {{ reporting_contacts.institution_name }}'s configured security channel: {{ reporting_contacts.security_team }}.</li>
+    <li>Use this reporting URL only after your institution configures and verifies it: {{ reporting_contacts.reporting_url }}.</li>
+    <li>If you entered credentials, contact the institution through a known official channel and change them there.</li>
+  </ol>
+</div></div>
+
+<div class="card pg-card mb-4">
+  <div class="card-body">
+    <h5>How PhishGuard AI Reads a Message</h5>
+    <ol>
+      <li>The message text is converted into TF-IDF features and scored by a trained classifier.</li>
+      <li>The same text is scanned by rule-based detectors for urgency, threats, credential requests,
+        suspicious URLs, sender mismatch, and payment requests.</li>
+      <li>Both scores are combined into a single 0&ndash;100 risk score and mapped to HIGH / MEDIUM / LOW
+        RISK, or INSUFFICIENT INFORMATION if the message is too short to judge.</li>
+      <li>Every result includes an explanation and safe next steps &mdash; never just a bare label.</li>
+    </ol>
+  </div>
+</div>
+
+<div class="alert alert-secondary small mb-0">
+  PhishGuard AI is an educational project. It does not replace your institution's official IT security
+  guidance and should not be the sole basis for a real security decision.
+</div>
+{% endblock %}

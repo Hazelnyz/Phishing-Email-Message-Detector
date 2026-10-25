@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}PhishGuard AI — Home{% endblock %}
+{% block content %}
+<div class="pg-hero text-center p-5 rounded-4 mb-5">
+  <h1 class="display-5 fw-bold mb-3">Check suspicious messages before acting</h1>
+  <p class="lead mb-4">Review message wording, links, and sender clues with a machine learning model and explainable rules.</p>
+  <a href="{{ url_for('analyze') }}" class="btn btn-primary">Analyze a Message</a>
+</div>
+
+<div class="row g-4 mb-5">
+  <div class="col-md-4"><div class="card h-100 pg-card"><div class="card-body"><h5>1. Paste a message</h5><p>Include its text and, if available, the sender or link text.</p></div></div></div>
+  <div class="col-md-4"><div class="card h-100 pg-card"><div class="card-body"><h5>2. Review the signals</h5><p>See the score, warning signs, and message evidence that informed the result.</p></div></div></div>
+  <div class="col-md-4"><div class="card h-100 pg-card"><div class="card-body"><h5>3. Verify independently</h5><p>Use a trusted channel before sharing information or taking action.</p></div></div></div>
+</div>
+
+<div class="alert alert-warning">
+  <strong>Scenario this project responds to:</strong> on 16 October 2026, students reported messages claiming
+  their VIT accounts would be suspended unless they clicked a link immediately. This is treated as a
+  <strong>hypothetical educational scenario</strong> for building and demonstrating phishing-detection tooling.
+  PhishGuard AI is not an official VIT system and does not represent VIT's IT department.
+</div>
+
+{% if metrics %}<section class="pg-notice mb-4" aria-label="Evaluation snapshot"><h2 class="h5">Latest evaluation</h2>
+<p>Selected email classifier: <strong>{{ metrics.email.selection.selected_model }}</strong>; F1 on its test split: <strong>{{ '%.4f'|format(metrics.email.test_sets.in_distribution[metrics.email.selection.selected_model].f1) }}</strong>.</p>
+<p>Selected URL classifier: <strong>{{ metrics.url.selection.selected_model }}</strong>; F1 on its test split: <strong>{{ '%.4f'|format(metrics.url.test_sets.in_distribution[metrics.url.selection.selected_model].f1) }}</strong>.</p>
+<p>Source and hard test results are available on the <a href="{{ url_for('performance') }}">performance page</a>; values are loaded from the evaluation JSON.</p></section>{% endif %}
+
+<p class="text-muted small">This educational tool provides flags for human review. A low risk result does not guarantee safety.</p>
+{% endblock %}

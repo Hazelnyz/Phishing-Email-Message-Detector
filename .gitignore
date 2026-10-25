@@ -1,0 +1,43 @@
+﻿# Python environments and caches
+venv/
+.venv/
+env/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+.secrets/
+*.pem
+*.key
+
+# Raw datasets
+data/raw/
+
+# Generated evaluation outputs
+evaluation/errors.csv
+evaluation/terminal_run.txt
+evaluation/model_comparison.png
+
+# Temporary files and build artifacts
+*.log
+*.tmp
+*.temp
+*.swp
+*.bak
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+.DS_Store
+Thumbs.db
+
+# Local Codex check
+.codex-write-access-check

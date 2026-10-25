@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Model Performance — PhishGuard AI{% endblock %}
+{% block content %}
+<h1 class="mb-3">Model Performance</h1>
+{% if not metrics %}<div class="alert alert-warning">Evaluation metrics are not available. Run <code>python run_pipeline.py</code>.</div>
+{% else %}
+<p class="pg-notice">All displayed measurements are loaded from <code>evaluation/metrics.json</code>. Email and URL metrics refer to separate classifiers. The independent email validation and handwritten hard test were evaluated after model selection.</p>
+{% for task in ['email','url'] %}
+<section class="card pg-card mb-4"><div class="card-body"><h2>{{ task|capitalize }} classifier</h2>
+<p>Selected: <strong>{{ metrics[task].selection.selected_model }}</strong>; validation threshold: <strong>{{ '%.4f'|format(metrics[task].selection.threshold) }}</strong>.</p>
+<h3 class="h5">Validation candidates</h3><table class="table table-sm table-bordered"><thead><tr><th>Model</th><th>Precision</th><th>Recall</th><th>F1</th></tr></thead><tbody>
+{% for name, r in metrics[task].selection.candidates.items() %}<tr><th>{{ name }}</th><td>{{ '%.4f'|format(r.precision) }}</td><td>{{ '%.4f'|format(r.recall) }}</td><td>{{ '%.4f'|format(r.f1) }}</td></tr>{% endfor %}
+</tbody></table>
+{% for setname, models in metrics[task].test_sets.items() %}<h3 class="h5 mt-4">{{ setname|replace('_',' ')|title }}</h3>
+{% for name, r in models.items() %}<h4 class="h6">{{ name }} ({{ r.size }} rows)</h4>
+<table class="table table-sm table-bordered"><thead><tr><th>Precision</th><th>Recall</th><th>F1</th><th>ROC-AUC</th></tr></thead><tbody><tr><td>{{ '%.4f'|format(r.precision) }}</td><td>{{ '%.4f'|format(r.recall) }}</td><td>{{ '%.4f'|format(r.f1) }}</td><td>{{ '%.4f'|format(r.roc_auc) if r.roc_auc is not none else 'Unavailable' }}</td></tr></tbody></table>
+<table class="table table-sm table-bordered text-center"><caption class="caption-top">Confusion matrix; actual rows, predicted columns (legitimate, phishing)</caption><tbody><tr><th>Legitimate</th><td>{{ r.confusion_matrix[0][0] }}</td><td>{{ r.confusion_matrix[0][1] }}</td></tr><tr><th>Phishing</th><td>{{ r.confusion_matrix[1][0] }}</td><td>{{ r.confusion_matrix[1][1] }}</td></tr></tbody></table>{% endfor %}{% endfor %}
+{% if task == 'email' %}<h3 class="h5 mt-4">Five-fold cross-validation</h3><table class="table table-sm table-bordered"><thead><tr><th>Model</th><th>Measure</th><th>Mean</th><th>Std dev</th></tr></thead><tbody>{% for name, measures in metrics.email.cross_validation.items() %}{% for measure, v in measures.items() %}<tr><th>{{ name }}</th><td>{{ measure }}</td><td>{{ '%.4f'|format(v.mean) }}</td><td>{{ '%.4f'|format(v.std) }}</td></tr>{% endfor %}{% endfor %}</tbody></table>{% endif %}
+</div></section>{% endfor %}
+<h2>Other evaluation sets</h2><pre>{{ metrics.validation.metrics|tojson(indent=2) }}</pre><pre>{{ metrics.hard_test.metrics|tojson(indent=2) }}</pre><p>SMS: {{ metrics.sms.reason }} Domain checks: {{ metrics.domain.status }}.</p>
+<h2 class="mt-5">End-to-end email evaluation</h2>
+<p>Each message was scored by the full pipeline: selected email model, URL model where a link was present, rules, and the risk floor. The permissive view counts HIGH or MEDIUM as phishing; the stricter view counts only HIGH. ML-only figures use the selected model and the same messages.</p>
+{% for setname, result in metrics.end_to_end.items() %}
+<section class="card pg-card mb-4"><div class="card-body"><h3 class="h5">{{ setname|replace('_',' ')|title }} ({{ result.size }} messages)</h3>
+<p>Risk label distribution: {% for label, count in result.risk_label_distribution.items() %}<strong>{{ label }}:</strong> {{ count }}{% if not loop.last %}; {% endif %}{% endfor %}</p>
+<div class="table-responsive"><table class="table table-sm table-bordered"><thead><tr><th>Evaluation</th><th>Precision</th><th>Recall</th><th>F1</th><th>Confusion matrix (actual rows, predicted columns)</th></tr></thead><tbody>
+<tr><th>ML-only selected model</th><td>{{ '%.4f'|format(result.ml_only_selected_model.precision) }}</td><td>{{ '%.4f'|format(result.ml_only_selected_model.recall) }}</td><td>{{ '%.4f'|format(result.ml_only_selected_model.f1) }}</td><td>{{ result.ml_only_selected_model.confusion_matrix|tojson }}</td></tr>
+<tr><th>Full pipeline: HIGH or MEDIUM = phishing</th><td>{{ '%.4f'|format(result.views.medium_or_high.precision) }}</td><td>{{ '%.4f'|format(result.views.medium_or_high.recall) }}</td><td>{{ '%.4f'|format(result.views.medium_or_high.f1) }}</td><td>{{ result.views.medium_or_high.confusion_matrix|tojson }}</td></tr>
+<tr><th>Full pipeline: HIGH only = phishing</th><td>{{ '%.4f'|format(result.views.high_only.precision) }}</td><td>{{ '%.4f'|format(result.views.high_only.recall) }}</td><td>{{ '%.4f'|format(result.views.high_only.f1) }}</td><td>{{ result.views.high_only.confusion_matrix|tojson }}</td></tr>
+</tbody></table></div></div></section>{% endfor %}
+<p class="small">Metrics describe the selected classifiers and do not include the separate rules-based risk floor. Small hand-written sets are not estimates of real-world performance.</p>
+{% endif %}{% endblock %}
